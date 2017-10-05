@@ -2187,7 +2187,7 @@ void ObjectMgr::LoadItemPrototypes()
 
         if (proto->DisenchantID)
         {
-            if (proto->Quality > ITEM_QUALITY_EPIC || proto->Quality < ITEM_QUALITY_UNCOMMON)
+            if (proto->Quality < ITEM_QUALITY_UNCOMMON)
             {
                 sLog.outErrorDb("Item (Entry: %u) has wrong quality (%u) for disenchanting, remove disenchanting loot id.", i, proto->Quality);
                 const_cast<ItemPrototype*>(proto)->DisenchantID = 0;
