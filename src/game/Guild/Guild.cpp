@@ -236,13 +236,16 @@ GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
     CharacterDatabase.PExecute("INSERT INTO guild_member (guildid,guid,rank,pnote,offnote) VALUES ('%u', '%u', '%u','%s','%s')",
                                m_Id, lowguid, newmember.RankId, dbPnote.c_str(), dbOFFnote.c_str());
 
+	CharacterDatabase.CommitTransaction();
+
     // If player not in game data in data field will be loaded from guild tables, no need to update it!!
     if (pl)
     {
         pl->SetInGuild(m_Id);
         pl->SetRank(newmember.RankId);
         pl->SetGuildIdInvited(0);
-    }
+		//Fixme: does not update client, so despite joining the guild will still be red to guildmembers until updated via group/running out of range or logging out
+	}	
 
     UpdateAccountsNumber();
 
@@ -545,6 +548,7 @@ bool Guild::DelMember(ObjectGuid guid, bool isDisbanding)
     {
         player->SetInGuild(0);
         player->SetRank(0);
+		//Fixme: despite being removed from the guild will still appear green to former guildmembers and can't be attacked until the updated status gets sent to players via grouping/being too far/relogging
     }
 
     CharacterDatabase.PExecute("DELETE FROM guild_member WHERE guid = '%u'", lowguid);

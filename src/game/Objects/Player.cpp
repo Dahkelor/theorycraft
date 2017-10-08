@@ -20131,8 +20131,7 @@ void Player::RefreshBitsForVisibleUnits(UpdateMask* mask, uint32 objectTypeMask)
         if (Object* obj = GetObjectByTypeMask(*itr, TypeMask(objectTypeMask)))
         {
             ByteBuffer buff(50);
-
-            buff << uint8(UPDATETYPE_VALUES);
+			buff << uint8(UPDATETYPE_VALUES);
             buff << obj->GetPackGUID();
             obj->BuildValuesUpdate(UPDATETYPE_VALUES, &buff, mask, this);
             data.AddUpdateBlock(buff);

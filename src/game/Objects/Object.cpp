@@ -653,13 +653,10 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                         FactionTemplateEntry const *ft1, *ft2;
                         ft1 = owner->getFactionTemplateEntry();
                         ft2 = target->getFactionTemplateEntry();
-                        if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2) && owner->IsInSameRaidWith(target))
-                            if (owner->IsInInterFactionMode() && target->IsInInterFactionMode())
-                                forceFriendly = true;
+                        if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2) && owner->IsFriendlyTo(target))
+	                        forceFriendly = true;
                     }
-                    uint32 faction = m_uint32Values[index];
-                    if (forceFriendly)
-                        faction = target->getFaction();
+                    uint32 faction = forceFriendly ? target->getFaction() : m_uint32Values[index];
 
                     *data << uint32(faction);
                 }
@@ -667,7 +664,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                 else if (index == PLAYER_FLAGS && (m_uint32Values[index] & PLAYER_FLAGS_FFA_PVP))
                 {
                     Player* owner = ((Unit*)this)->GetCharmerOrOwnerPlayerOrPlayerItself();
-                    if (owner && owner != target && owner->IsInSameRaidWith(target))
+                    if (owner && owner != target && owner->IsFriendlyTo(target))
                         *data << uint32(m_uint32Values[index] & ~PLAYER_FLAGS_FFA_PVP);
                     else
                         *data << uint32(m_uint32Values[index]);

@@ -1874,7 +1874,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool IsInPartyWith(Unit const* unit) const;
         bool IsInRaidWith(Unit const* unit) const;
-        void SetMovement(UnitMovementType pType);
+		bool IsInGuildWith(Unit const* unit) const;
+		void SetMovement(UnitMovementType pType);
         bool HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel= nullptr) const;
         bool HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura) const;
 
