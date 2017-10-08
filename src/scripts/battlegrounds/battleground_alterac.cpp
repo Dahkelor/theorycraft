@@ -127,9 +127,9 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
     void EnterEvadeMode()
     {
         if (m_bLeashed)
-            m_creature->MonsterYellToZone(VANNDAR_RESET, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(VANNDAR_RESET, LANG_COMMON, 0);
         else
-            m_creature->MonsterYellToZone(VANNDAR_RAID_WIPE, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(VANNDAR_RAID_WIPE, LANG_COMMON, 0);
 
         m_bLeashed = false;
         ScriptedAI::EnterEvadeMode();
@@ -139,7 +139,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
     {
         if (m_bAggro)
         {
-            m_creature->MonsterYellToZone(VANNDAR_AGGRO, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(VANNDAR_AGGRO, LANG_COMMON, 0);
             m_bAggro = false;
         }
     }
@@ -228,35 +228,35 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
         if (m_creature->GetHealthPercent() < 80.0f && m_bCombat1)
         {
             m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_COMMON, 0);
             m_bCombat1 = false;
         }
 
         if (m_creature->GetHealthPercent() < 60.0f && m_bCombat2)
         {
             m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_COMMON, 0);
             m_bCombat2 = false;
         }
 
         if (m_creature->GetHealthPercent() < 40.0f && m_bCombat3)
         {
             m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_COMMON, 0);
             m_bCombat3 = false;
         }
 
         if (m_creature->GetHealthPercent() < 20.0f && m_bCombat4)
         {
             m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_COMMON, 0);
             m_bCombat4 = false;
         }
 
         if (m_creature->GetHealthPercent() < 5.0f && m_bCombat5)
         {
             m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_COMMON, 0);
             m_bCombat5 = false;
         }
 
@@ -382,9 +382,9 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
     void EnterEvadeMode()
     {
         if (m_bLeashed)
-            m_creature->MonsterYellToZone(DREKTHAR_RESET, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(DREKTHAR_RESET, LANG_ORCISH, 0);
         else
-            m_creature->MonsterYellToZone(DREKTHAR_RAID_WIPE, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(DREKTHAR_RAID_WIPE, LANG_ORCISH, 0);
 
         m_bLeashed = false;
         ScriptedAI::EnterEvadeMode();
@@ -394,7 +394,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
     {
         if (m_bAggro)
         {
-            m_creature->MonsterYellToZone(DREKTHAR_AGGRO, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(DREKTHAR_AGGRO, LANG_ORCISH, 0);
             m_bAggro = false;
         }
     }
@@ -502,35 +502,35 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
         if (m_creature->GetHealthPercent() < 80.0f && m_bCombat1)
         {
             m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_ORCISH, 0);
             m_bCombat1 = false;
         }
 
         if (m_creature->GetHealthPercent() < 60.0f && m_bCombat2)
         {
             m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_ORCISH, 0);
             m_bCombat2 = false;
         }
 
         if (m_creature->GetHealthPercent() < 40.0f && m_bCombat3)
         {
             m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_ORCISH, 0);
             m_bCombat3 = false;
         }
 
         if (m_creature->GetHealthPercent() < 20.0f && m_bCombat4)
         {
             m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_ORCISH, 0);
             m_bCombat4 = false;
         }
 
         if (m_creature->GetHealthPercent() < 5.0f && m_bCombat5)
         {
             m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_ORCISH, 0);
             m_bCombat5 = false;
         }
 
@@ -594,7 +594,7 @@ struct npc_BalindaAI : public ScriptedAI
         m_uiPolymorph_Timer = 1750;
         m_creature->clearUnitState(UNIT_STAT_ROOT);
         if (m_bReset)
-            m_creature->MonsterYellToZone(SAY_RESET, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(SAY_RESET, LANG_COMMON, 0);
         m_bReset = true;
         m_sayBalinda = true;
         m_bSayAggro = true;
@@ -613,7 +613,7 @@ struct npc_BalindaAI : public ScriptedAI
     {
         if (m_bSayAggro)
         {
-            m_creature->MonsterYellToZone(SAY_AGGRO, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(SAY_AGGRO, LANG_COMMON, 0);
             m_bSayAggro = false;
         }
     }
@@ -637,7 +637,7 @@ struct npc_BalindaAI : public ScriptedAI
         {
             if (m_creature->GetHealthPercent() < 50.0f)
             {
-                m_creature->MonsterYellToZone(SAY_BALINDA, LANG_UNIVERSAL, 0);
+                m_creature->MonsterYellToZone(SAY_BALINDA, LANG_COMMON, 0);
                 m_sayBalinda = false;
             }
         }
@@ -821,7 +821,7 @@ struct npc_GalvangarAI : public ScriptedAI
     {
         if (m_bSayAggro)
         {
-            m_creature->MonsterYellToZone(SAY_AGGRO_GALVANGAR, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(SAY_AGGRO_GALVANGAR, LANG_ORCISH, 0);
             m_bSayAggro = false;
         }
     }
@@ -837,7 +837,7 @@ struct npc_GalvangarAI : public ScriptedAI
         m_uiFrighteningShout_Timer = m_uiWhirlwind_Timer + urand(1000, 5000);
         m_creature->clearUnitState(UNIT_STAT_ROOT);
         if (m_bReset)
-            m_creature->MonsterYellToZone(SAY_RESET_GALVANGAR, LANG_UNIVERSAL, 0);
+            m_creature->MonsterYellToZone(SAY_RESET_GALVANGAR, LANG_ORCISH, 0);
         m_bReset = true;
         m_bSayGalvangar = true;
         m_bSayAggro     = true;
@@ -880,7 +880,7 @@ struct npc_GalvangarAI : public ScriptedAI
         {
             if (m_creature->GetHealthPercent() < 50.0f)
             {
-                m_creature->MonsterYellToZone(SAY_HALF_LIFE_GALVANGAR, LANG_UNIVERSAL, 0);
+                m_creature->MonsterYellToZone(SAY_HALF_LIFE_GALVANGAR, LANG_ORCISH, 0);
                 m_bSayGalvangar = false;
             }
         }
@@ -4353,7 +4353,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         {
             /** Each time a player is killed, cast Swell of Souls spell.
              * Maximum of 20 stacks allowed. */
-            m_creature->MonsterYell("I drink in your suffering! Let your essence congeal with Lokholar!", 0, 0);
+            m_creature->MonsterYell("I drink in your suffering! Let your essence congeal with Lokholar!", LANG_COMMON, 0);
             DoCastSpellIfCan(m_creature, SPELL_WB_SWELLOFSOULS, true);
         }
     }
@@ -4362,7 +4362,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
     {
         if (!isYelling)
         {
-            m_creature->MonsterYell("WHO DARES SUMMON LOKHOLAR? The blood of a thousand Alliance soldiers I shall spill...none shall stand against the might of the Ice Lord!", LANG_UNIVERSAL, 0);
+            m_creature->MonsterYell("WHO DARES SUMMON LOKHOLAR? The blood of a thousand Alliance soldiers I shall spill...none shall stand against the might of the Ice Lord!", LANG_COMMON, 0);
             isYelling = true;
         }
 

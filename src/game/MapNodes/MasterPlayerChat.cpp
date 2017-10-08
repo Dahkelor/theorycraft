@@ -40,9 +40,6 @@ void MasterPlayer::UpdateSpeakTime()
 
 void MasterPlayer::Whisper(const std::string& text, uint32 language, MasterPlayer* receiver)
 {
-    if (language != LANG_ADDON)                             // if not addon data
-        language = LANG_UNIVERSAL;                          // whispers should always be readable
-
     WorldPacket data(SMSG_MESSAGECHAT, 100);
     Player::BuildPlayerChat(GetObjectGuid(), chatTag(), &data, CHAT_MSG_WHISPER, text, language);
     receiver->GetSession()->SendPacket(&data);
