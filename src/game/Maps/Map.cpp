@@ -151,6 +151,10 @@ public:
     Map* map;
 };
 
+void DungeonMap::SetGroupType(uint8 groupType)
+{
+	m_groupType = groupType;
+}
 
 void Map::SpawnActiveObjects()
 {
@@ -1546,7 +1550,15 @@ void Map::AddToActive(WorldObject* obj)
     {
         Creature* c = (Creature*)obj;
 
-        if (!c->IsPet() && c->HasStaticDBSpawnData())
+		if (IsDungeon() && ((DungeonMap*)this)->GetGroupType())
+		{
+			if (c->GetCreatureInfo()->groupType != 0)
+			{
+				sLog.outString("Istaria: Former, %d %s (%d - %d)", c->GetCreatureInfo()->groupType, c->GetName(), c->GetGUID(), c->GetGUIDLow());
+				exit(1);
+			}
+		}
+		if (!c->IsPet() && c->HasStaticDBSpawnData())
         {
             float x, y, z;
             c->GetRespawnCoord(x, y, z);
@@ -1724,18 +1736,24 @@ bool DungeonMap::CanEnter(Player *player)
         return false;
     }
 
-    // cannot enter if the instance is full (player cap), GMs don't count
-    uint32 maxPlayers = GetMaxPlayers();
+	if (GetGroupType() == 0 && player->getLevel() > i_mapEntry->levelMax)
+	{
+		DETAIL_LOG("MAP: Instance '%u' of map '%s' has a maximum level limit of %u. Player '%s' (level %u) was not allowed to enter.", GetInstanceId(), GetMapName(), i_mapEntry->levelMax, player->GetName(), player->getLevel());
+		player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
+		return false;
+	}
+	// cannot enter if the instance is full (player cap), GMs don't count
+    uint32 maxPlayers = IsRaid() ? GetMaxPlayers() : GetGroupType() == 2 ? 20 : GetMaxPlayers();
     if (!player->isGameMaster() && GetPlayersCountExceptGMs() >= maxPlayers)
     {
         DETAIL_LOG("MAP: Instance '%u' of map '%s' cannot have more than '%u' players. Player '%s' rejected", GetInstanceId(), GetMapName(), maxPlayers, player->GetName());
-        player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
+        // Fixme: need to send a custom message to player telling him why he couldn't enter
         return false;
     }
 
     if (m_resetAfterUnload)
     {
-        sLog.outInfo("[DungeonReset] %s attempted to enter map %u, instance %u during reset", player->GetName(), i_InstanceId);
+        sLog.outInfo("[] %s attempted to enter map %u, instance %u during reset", player->GetName(), i_InstanceId);
         return false;
     }
 
@@ -1859,8 +1877,9 @@ bool DungeonMap::Add(Player *player)
     SetResetSchedule(false);
     player->AddInstanceEnterTime(GetInstanceId(), time(NULL));
 
-    DETAIL_LOG("MAP: Player '%s' is entering instance '%u' of map '%s'", player->GetName(), GetInstanceId(), GetMapName());
-    // initialize unload state
+    DETAIL_LOG("MAP: Player '%s' is entering a type %d instance '%u' of map '%s'", player->GetName(), m_groupType, GetInstanceId(), GetMapName());
+
+	// initialize unload state
     m_unloadTimer = 0;
     m_resetAfterUnload = false;
     m_unloadWhenEmpty = false;
@@ -1991,6 +2010,11 @@ void DungeonMap::SetResetSchedule(bool on)
     ASSERT(GetPersistanceState()->GetMapId() == GetId());
     if (!HavePlayers() && !IsRaid())
         sMapPersistentStateMgr.GetScheduler().ScheduleReset(on, GetPersistanceState()->GetResetTime(), DungeonResetEvent(RESET_EVENT_NORMAL_DUNGEON, GetId(), GetInstanceId()));
+}
+
+uint8 DungeonMap::GetGroupType() const
+{
+	return m_groupType;
 }
 
 uint32 DungeonMap::GetMaxPlayers() const

@@ -504,15 +504,21 @@ Map* MapManager::CreateInstance(uint32 id, Player * player)
         map = FindMap(id, NewInstanceId);
         // it is possible that the save exists but the map doesn't
         if (!map)
-            pNewMap = CreateDungeonMap(id, NewInstanceId, pSave);
+            pNewMap = CreateDungeonMap(id, NewInstanceId, 0, pSave);
     }
     else
     {
+		uint8 groupType = 0;
         // if no instanceId via group members or instance saves is found
         // the instance will be created for the first time
-        NewInstanceId = GenerateInstanceId();
+		NewInstanceId = GenerateInstanceId();
         newlyGeneratedInstanceId = true;
-        pNewMap = CreateDungeonMap(id, NewInstanceId);
+		if (player->GetGroup() && player->GetGroup()->isRaidGroup())
+			groupType = 2;
+		else if (player->getLevel() > entry->levelMax)
+			groupType = 1;
+
+        pNewMap = CreateDungeonMap(id, NewInstanceId, groupType);
     }
 
     //add a new map object into the registry
@@ -573,7 +579,7 @@ void MapManager::DeleteTestMap(Map* map)
     delete map;
 }
 
-DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState *save)
+DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, uint8 groupType, DungeonPersistentState *save)
 {
     // make sure we have a valid map id
     const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(id);
@@ -583,14 +589,16 @@ DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPe
         MANGOS_ASSERT(false);
     }
 
-    DEBUG_LOG("MapInstanced::CreateInstanceMap: %s map instance %d for %d created", save ? "" : "new ", InstanceId, id);
+    DEBUG_LOG("MapInstanced::CreateInstanceMap: %smap instance %d for %d created (groupType %d)", save ? "" : "new ", InstanceId, id, groupType);
 
     DungeonMap *map = new DungeonMap(id, i_gridCleanUpDelay, InstanceId);
 
     // Dungeons can have saved instance data
     bool load_data = save != NULL;
-    map->CreateInstanceData(load_data);
+	map->SetGroupType(groupType);
+	map->CreateInstanceData(load_data);
     map->SpawnActiveObjects();
+
     return map;
 }
 

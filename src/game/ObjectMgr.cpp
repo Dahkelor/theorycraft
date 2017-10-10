@@ -1084,6 +1084,12 @@ void ObjectMgr::CheckCreatureTemplates()
                 sLog.outErrorDb("Table `creature_template` have creature (Entry: %u) with vendor_id %u but not have flag UNIT_NPC_FLAG_VENDOR (%u), vendor items will ignored.", cInfo->Entry, cInfo->vendorId, UNIT_NPC_FLAG_VENDOR);
         }
 
+		if (cInfo->groupType > 2 || cInfo->groupType < 0)
+		{
+			sLog.outErrorDb("Table `creature_template` has creature (Entry: %u) with a groupType %u which is out of range. Correct range is 0-2.", cInfo->Entry, cInfo->groupType);
+			const_cast<CreatureInfo*>(cInfo)->groupType = 0;
+		}
+
         /// if not set custom creature scale then load scale from CreatureDisplayInfo.dbc
         if (cInfo->scale <= 0.0f)
         {
@@ -1429,7 +1435,7 @@ void ObjectMgr::LoadCreatures(bool reload)
                           "equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint,"
                           //   12         13       14          15            16
                           "curhealth, curmana, DeathState, MovementType, event,"
-                          //   17                        18                                 19          20        21
+                          //   17                        18                                 19          20        21		22
                           "pool_creature.pool_entry, pool_creature_template.pool_entry, spawnFlags, patch_min, patch_max "
                           "FROM creature "
                           "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
@@ -1442,7 +1448,7 @@ void ObjectMgr::LoadCreatures(bool reload)
 
         bar.step();
 
-        sLog.outString();
+        sLog.outString("");
         sLog.outErrorDb(">> Loaded 0 creature. DB table `creature` is empty.");
         return;
     }
@@ -1451,62 +1457,62 @@ void ObjectMgr::LoadCreatures(bool reload)
 
     BarGoLink bar(result->GetRowCount());
 
-    do
-    {
-        Field *fields = result->Fetch();
-        bar.step();
+	do
+	{
+		Field *fields = result->Fetch();
+		bar.step();
 
-        uint32 guid         = fields[ 0].GetUInt32();
-        uint32 entry        = fields[ 1].GetUInt32();
-        uint8 patch_min     = fields[20].GetUInt8();
-        uint8 patch_max     = fields[21].GetUInt8();
-        bool existsInPatch  = true;
+		uint32 guid = fields[0].GetUInt32();
+		uint32 entry = fields[1].GetUInt32();
+		uint8 patch_min = fields[20].GetUInt8();
+		uint8 patch_max = fields[21].GetUInt8();
+		bool existsInPatch = true;
 
-        if ((patch_min > patch_max) || (patch_max > 10))
-        {
-            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has invalid values min_patch=%u, max_patch=%u.", guid, entry, patch_min, patch_max);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET min_patch=0, max_patch=10 WHERE guid=%u AND id=%u;", guid, entry);
-            patch_min = 0;
-            patch_max = 10;
-        }
+		if ((patch_min > patch_max) || (patch_max > 10))
+		{
+			sLog.outErrorDb("Table `creature` GUID %u (entry %u) has invalid values min_patch=%u, max_patch=%u.", guid, entry, patch_min, patch_max);
+			sLog.out(LOG_DBERRFIX, "UPDATE creature SET min_patch=0, max_patch=10 WHERE guid=%u AND id=%u;", guid, entry);
+			patch_min = 0;
+			patch_max = 10;
+		}
 
-        if (!((sWorld.GetWowPatch() >= patch_min) && (sWorld.GetWowPatch() <= patch_max)))
-            existsInPatch = false;
+		if (!((sWorld.GetWowPatch() >= patch_min) && (sWorld.GetWowPatch() <= patch_max)))
+			existsInPatch = false;
 
-        CreatureInfo const* cInfo = GetCreatureTemplate(entry);
-        if (!cInfo)
-        {
-            if (existsInPatch) // don't print error when it is not loaded for the current patch
-            {
-                sLog.outErrorDb("Table `creature` has creature (GUID: %u) with non existing creature entry %u, skipped.", guid, entry);
-                sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u;", guid);
-            }
-            continue;
-        }
+		CreatureInfo const* cInfo = GetCreatureTemplate(entry);
+		if (!cInfo)
+		{
+			if (existsInPatch) // don't print error when it is not loaded for the current patch
+			{
+				sLog.outErrorDb("Table `creature` has creature (GUID: %u) with non existing creature entry %u, skipped.", guid, entry);
+				sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u;", guid);
+			}
+			continue;
+		}
 
-        bool alreadyPresent = reload && mCreatureDataMap.find(guid) != mCreatureDataMap.end();
-        CreatureData& data = mCreatureDataMap[guid];
+		bool alreadyPresent = reload && mCreatureDataMap.find(guid) != mCreatureDataMap.end();
+		CreatureData& data = mCreatureDataMap[guid];
 
-        data.id                 = entry;
-        data.mapid              = fields[ 2].GetUInt32();
-        data.modelid_override   = fields[ 3].GetUInt32();
-        data.equipmentId        = fields[ 4].GetUInt32();
-        data.posX               = fields[ 5].GetFloat();
-        data.posY               = fields[ 6].GetFloat();
-        data.posZ               = fields[ 7].GetFloat();
-        data.orientation        = fields[ 8].GetFloat();
-        data.spawntimesecs      = fields[ 9].GetUInt32();
-        data.spawndist          = fields[10].GetFloat();
-        data.currentwaypoint    = fields[11].GetUInt32();
-        data.curhealth          = fields[12].GetUInt32();
-        data.curmana            = fields[13].GetUInt32();
-        data.is_dead            = fields[14].GetBool();
-        data.movementType       = fields[15].GetUInt8();
-        data.spawnFlags         = fields[19].GetUInt32();
-        data.instanciatedContinentInstanceId = sMapMgr.GetContinentInstanceId(data.mapid, data.posX, data.posY);
-        int16 gameEvent         = fields[16].GetInt16();
-        int16 GuidPoolId        = fields[17].GetInt16();
-        int16 EntryPoolId       = fields[18].GetInt16();
+		data.id = entry;
+		data.mapid = fields[2].GetUInt32();
+		data.modelid_override = fields[3].GetUInt32();
+		data.equipmentId = fields[4].GetUInt32();
+		data.posX = fields[5].GetFloat();
+		data.posY = fields[6].GetFloat();
+		data.posZ = fields[7].GetFloat();
+		data.orientation = fields[8].GetFloat();
+		data.spawntimesecs = fields[9].GetUInt32();
+		data.spawndist = fields[10].GetFloat();
+		data.currentwaypoint = fields[11].GetUInt32();
+		data.curhealth = fields[12].GetUInt32();
+		data.curmana = fields[13].GetUInt32();
+		data.is_dead = fields[14].GetBool();
+		data.movementType = fields[15].GetUInt8();
+		data.spawnFlags = fields[19].GetUInt32();
+		data.instanciatedContinentInstanceId = sMapMgr.GetContinentInstanceId(data.mapid, data.posX, data.posY);
+		int16 gameEvent = fields[16].GetInt16();
+		int16 GuidPoolId = fields[17].GetInt16();
+		int16 EntryPoolId = fields[18].GetInt16();
 
         MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(data.mapid);
         if (!mapEntry)

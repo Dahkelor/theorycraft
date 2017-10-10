@@ -646,7 +646,8 @@ class MANGOS_DLL_SPEC DungeonMap : public Map
         void SendResetWarnings(uint32 timeLeft) const;
         void SetResetSchedule(bool on);
         uint32 GetMaxPlayers() const;
-
+		void SetGroupType(uint8 groupType);
+		uint8 GetGroupType() const;
         // can't be NULL for loaded map
         DungeonPersistentState* GetPersistanceState() const;
 
@@ -656,6 +657,7 @@ class MANGOS_DLL_SPEC DungeonMap : public Map
     private:
         bool m_resetAfterUnload;
         bool m_unloadWhenEmpty;
+		uint8 m_groupType;
 };
 
 class MANGOS_DLL_SPEC BattleGroundMap : public Map

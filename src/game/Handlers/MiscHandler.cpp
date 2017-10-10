@@ -886,37 +886,17 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             pl->SpawnCorpseBones();
         }
 
-        uint32 missingLevel = 0;
-        if (GetPlayer()->getLevel() < at->requiredLevel && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_LEVEL))
-            missingLevel = at->requiredLevel;
+		bool missingLevel = false;
+		if (GetPlayer()->getLevel() < at->requiredLevel)
+			missingLevel = true;
 
-        // must have one or the other, report the first one that's missing
         uint32 missingItem = 0;
-        if (at->requiredItem)
-        {
-            if (!pl->HasItemCount(at->requiredItem, 1) &&
-                    (!at->requiredItem2 || !GetPlayer()->HasItemCount(at->requiredItem2, 1)))
-                missingItem = at->requiredItem;
-        }
-        else if (at->requiredItem2 && !GetPlayer()->HasItemCount(at->requiredItem2, 1))
-            missingItem = at->requiredItem2;
+		if (at->requiredItem && !pl->HasItemCount(at->requiredItem, 1))
+			missingItem = at->requiredItem;
 
-        // La verification de naxxramas.
-        if (Trigger_ID == 4055) // Naxxramas (Entrance)
-        {
-            // A retirer lors de l'ouverture de l'instance apres travaux.
-//            SendAreaTriggerMessage("Instance En Travaux");
-//            return;
-            //
-
-            if (!GetPlayer()->GetQuestRewardStatus(9121) && !GetPlayer()->GetQuestRewardStatus(9122) && !GetPlayer()->GetQuestRewardStatus(9123))
-            {
-//               SendAreaTriggerMessage("You need to accomplish the Naxxramas quest to enter");
-                return;
-            }
-
-        }
-        // fin Verification Naxxramas
+        // Fixme: Naxxramas entry does not need to be this complex, all specific reputation quests should lead to the same quest which is checked
+        if (Trigger_ID == 4055 && (!GetPlayer()->GetQuestRewardStatus(9121) && !GetPlayer()->GetQuestRewardStatus(9122) && !GetPlayer()->GetQuestRewardStatus(9123)))
+			return;
 
         uint32 missingQuest = 0;
         if (at->requiredQuest && !GetPlayer()->GetQuestRewardStatus(at->requiredQuest))
