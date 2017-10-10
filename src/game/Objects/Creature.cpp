@@ -1516,6 +1516,10 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     }
     if (data->spawnFlags & SPAWN_FLAG_DISABLED)
         return false;
+	
+	// Creature does not spawn in this version of the instance
+	if (map->IsDungeon() && ((DungeonMap*)map)->GetGroupType() != data->groupType)
+		return false;
 
     CreatureInfo const *cinfo = ObjectMgr::GetCreatureTemplate(data->id);
     if (!cinfo)
@@ -1523,12 +1527,8 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
         sLog.outErrorDb("Creature (Entry: %u) not found in table `creature_template`, can't load. ", data->id);
         return false;
     }
-	if (map->IsDungeon() && ((DungeonMap*)map)->GetGroupType() != cinfo->groupType)
-	{
-		sLog.outString("Istaria: Success! %d %s", cinfo->groupType, cinfo->Name);
-		return false;
-	}
-    GameEventCreatureData const* eventData = sGameEventMgr.GetCreatureUpdateDataForActiveEvent(guidlow);
+	
+	GameEventCreatureData const* eventData = sGameEventMgr.GetCreatureUpdateDataForActiveEvent(guidlow);
 
     // Creature can be loaded already in map if grid has been unloaded while creature walk to another grid
     if (map->GetCreature(cinfo->GetObjectGuid(guidlow)))

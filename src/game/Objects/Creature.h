@@ -142,7 +142,6 @@ struct CreatureInfo
     uint32  SchoolImmuneMask;
     uint32  flags_extra;
     uint32  ScriptID;
-	uint8   groupType;
 
     // helpers
     static HighGuid GetHighGuid()
@@ -202,6 +201,7 @@ struct CreatureData
     bool  is_dead;
     uint8 movementType;
     uint32 spawnFlags;
+	uint8 groupType;
 
     uint32 instanciatedContinentInstanceId;
     // helper function

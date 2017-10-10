@@ -1084,12 +1084,6 @@ void ObjectMgr::CheckCreatureTemplates()
                 sLog.outErrorDb("Table `creature_template` have creature (Entry: %u) with vendor_id %u but not have flag UNIT_NPC_FLAG_VENDOR (%u), vendor items will ignored.", cInfo->Entry, cInfo->vendorId, UNIT_NPC_FLAG_VENDOR);
         }
 
-		if (cInfo->groupType > 2 || cInfo->groupType < 0)
-		{
-			sLog.outErrorDb("Table `creature_template` has creature (Entry: %u) with a groupType %u which is out of range. Correct range is 0-2.", cInfo->Entry, cInfo->groupType);
-			const_cast<CreatureInfo*>(cInfo)->groupType = 0;
-		}
-
         /// if not set custom creature scale then load scale from CreatureDisplayInfo.dbc
         if (cInfo->scale <= 0.0f)
         {
@@ -1436,7 +1430,7 @@ void ObjectMgr::LoadCreatures(bool reload)
                           //   12         13       14          15            16
                           "curhealth, curmana, DeathState, MovementType, event,"
                           //   17                        18                                 19          20        21		22
-                          "pool_creature.pool_entry, pool_creature_template.pool_entry, spawnFlags, patch_min, patch_max "
+                          "pool_creature.pool_entry, pool_creature_template.pool_entry, spawnFlags, patch_min, patch_max, groupType "
                           "FROM creature "
                           "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
                           "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid "
@@ -1510,20 +1504,27 @@ void ObjectMgr::LoadCreatures(bool reload)
 		data.movementType = fields[15].GetUInt8();
 		data.spawnFlags = fields[19].GetUInt32();
 		data.instanciatedContinentInstanceId = sMapMgr.GetContinentInstanceId(data.mapid, data.posX, data.posY);
+		data.groupType = fields[22].GetUInt8();
 		int16 gameEvent = fields[16].GetInt16();
 		int16 GuidPoolId = fields[17].GetInt16();
 		int16 EntryPoolId = fields[18].GetInt16();
 
-        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(data.mapid);
-        if (!mapEntry)
-        {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u) that spawned at nonexistent map (Id: %u), skipped.", guid, data.mapid);
-            sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u AND id=%u;", guid, data.id);
-            continue;
-        }
+		MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(data.mapid);
+		if (!mapEntry)
+		{
+			sLog.outErrorDb("Table `creature` have creature (GUID: %u) that spawned at nonexistent map (Id: %u), skipped.", guid, data.mapid);
+			sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u AND id=%u;", guid, data.id);
+			continue;
+		}
 
-        if (!existsInPatch)
-            data.spawnFlags |= SPAWN_FLAG_DISABLED;
+		if (!existsInPatch)
+			data.spawnFlags |= SPAWN_FLAG_DISABLED;
+
+		if (data.groupType > 2) 
+		{
+			sLog.outErrorDb("Table 'creature' has a wrong groupType for GUID %u. Valid range is 0-2.", guid);
+			data.groupType = 0;
+		}
 
         if (data.modelid_override > 0 && !sCreatureDisplayInfoStore.LookupEntry(data.modelid_override))
         {
@@ -1532,15 +1533,12 @@ void ObjectMgr::LoadCreatures(bool reload)
             data.modelid_override = 0;
         }
 
-        if (data.equipmentId > 0)                           // -1 no equipment, 0 use default
-        {
-            if (!GetEquipmentInfo(data.equipmentId) && !GetEquipmentInfoRaw(data.equipmentId))
-            {
-                sLog.outErrorDb("Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template` or `creature_equip_template_raw`, set to no equipment.", data.id, data.equipmentId);
-                data.equipmentId = -1;
-            }
-        }
-
+		if (data.equipmentId > 0 && !GetEquipmentInfo(data.equipmentId) && !GetEquipmentInfoRaw(data.equipmentId))
+		{
+			sLog.outErrorDb("Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template` or `creature_equip_template_raw`, set to no equipment.", data.id, data.equipmentId);
+			data.equipmentId = -1;
+		}
+        
         if (cInfo->RegenHealth && data.curhealth < cInfo->minhealth)
         {
             sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `creature_template`.`RegenHealth`=1 and low current health (%u), `creature_template`.`minhealth`=%u.", guid, data.id, data.curhealth, cInfo->minhealth);

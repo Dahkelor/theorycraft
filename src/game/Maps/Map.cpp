@@ -1550,14 +1550,6 @@ void Map::AddToActive(WorldObject* obj)
     {
         Creature* c = (Creature*)obj;
 
-		if (IsDungeon() && ((DungeonMap*)this)->GetGroupType())
-		{
-			if (c->GetCreatureInfo()->groupType != 0)
-			{
-				sLog.outString("Istaria: Former, %d %s (%d - %d)", c->GetCreatureInfo()->groupType, c->GetName(), c->GetGUID(), c->GetGUIDLow());
-				exit(1);
-			}
-		}
 		if (!c->IsPet() && c->HasStaticDBSpawnData())
         {
             float x, y, z;
