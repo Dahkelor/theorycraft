@@ -7365,7 +7365,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                 if (item->HasGeneratedLootSecondary()) // temporary check, merge conditions later
                 {
                     sLog.outError("%s attempted to regenerate %s at map %u, zone %u, area %u - grouped? %s",
-                        GetGuidStr().c_str(), item->GetGuidStr().c_str(), GetMap()->GetId(), GetZoneId(), GetAreaId(), GetGroup()? "yes" : "no");
+                        GetGuidStr().c_str(), item->GetGuidStr().c_str(), GetMap()->GetId(), GetZoneId(), GetAreaId(), GetGroup() ? "yes" : "no");
                     GetSession()->ProcessAnticheatAction("ItemsCheck", "Player::SendLoot: attempted to regenerate container loot", CHEAT_ACTION_LOG);
                     SendLootRelease(guid);
                     return;
@@ -7375,16 +7375,20 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
 
                 switch (loot_type)
                 {
-                    case LOOT_DISENCHANTING:
-                        loot->FillLoot(item->GetProto()->DisenchantID, LootTemplates_Disenchant, this, true);
-                        item->SetLootState(ITEM_LOOT_TEMPORARY);
-                        break;
-                    default:
-                        loot->FillLoot(item->GetEntry(), LootTemplates_Item, this, true, item->GetProto()->MaxMoneyLoot == 0);
-                        loot->generateMoneyLoot(item->GetProto()->MinMoneyLoot, item->GetProto()->MaxMoneyLoot);
-                        item->SetLootState(ITEM_LOOT_CHANGED);
-                        item->SetGeneratedLoot(true);
-                        break;
+                case LOOT_DISENCHANTING:
+                    // Regrade is successful 33% of the time. If unsuccessful, item is destroyed. Upgraded items have an id +1M 
+                    if ((urand(0, 100) < 67 || isGameMaster()) && item->GetProto()->DisenchantID > 100)
+                        loot->AddItem(LootStoreItem(item->GetEntry() + 100000, 100, 0, 0, 1, 1));
+                    else
+                        loot->FillLoot(item->GetProto()->DisenchantID % 100, LootTemplates_Disenchant, this, true);
+                    item->SetLootState(ITEM_LOOT_TEMPORARY);
+                    break;
+                default:
+                    loot->FillLoot(item->GetEntry(), LootTemplates_Item, this, true, item->GetProto()->MaxMoneyLoot == 0);
+                    loot->generateMoneyLoot(item->GetProto()->MinMoneyLoot, item->GetProto()->MaxMoneyLoot);
+                    item->SetLootState(ITEM_LOOT_CHANGED);
+                    item->SetGeneratedLoot(true);
+                    break;
                 }
             }
             break;
