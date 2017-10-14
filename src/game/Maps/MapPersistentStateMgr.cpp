@@ -242,10 +242,14 @@ void DungeonPersistentState::SaveToDB()
 {
     // state instance data too
     std::string data;
+	uint8 groupType = 0;
 
     if (Map *map = GetMap())
     {
-        InstanceData *iData = map->GetInstanceData();
+		if (map->IsDungeon())
+			groupType = ((DungeonMap*)map)->GetGroupType();
+
+		InstanceData *iData = map->GetInstanceData();
         if (iData && iData->Save())
         {
             data = iData->Save();
@@ -253,7 +257,7 @@ void DungeonPersistentState::SaveToDB()
         }
     }
 
-    CharacterDatabase.PExecute("INSERT INTO instance VALUES ('%u', '%u', '" UI64FMTD "', '%s')", GetInstanceId(), GetMapId(), (uint64)GetResetTimeForDB(), data.c_str());
+    CharacterDatabase.PExecute("INSERT INTO instance VALUES ('%u', '%u', '" UI64FMTD "', '%s', '%u')", GetInstanceId(), GetMapId(), (uint64)GetResetTimeForDB(), data.c_str(), groupType);
 }
 
 void DungeonPersistentState::DeleteRespawnTimesAndData()

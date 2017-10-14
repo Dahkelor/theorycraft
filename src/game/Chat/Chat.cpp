@@ -2296,10 +2296,7 @@ void ChatHandler::FillMessageData(WorldPacket *data, WorldSession* session, uint
 
     data->Initialize(SMSG_MESSAGECHAT, 100);                // guess size
     *data << uint8(type);
-    if ((type != CHAT_MSG_CHANNEL && type != CHAT_MSG_WHISPER) || language == LANG_ADDON)
-        *data << uint32(language);
-    else
-        *data << uint32(LANG_UNIVERSAL);
+    *data << uint32(language);
 
     if (type == CHAT_MSG_CHANNEL)
     {

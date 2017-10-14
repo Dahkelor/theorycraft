@@ -5455,21 +5455,21 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
     Player const* targetPlayerOwner = target->GetAffectingPlayer();
 
     // check forced reputation to support SPELL_AURA_FORCE_REACTION
-    if (selfPlayerOwner)
-    {
-        if (selfPlayerOwner->isGameMaster())
-            return REP_NEUTRAL;
-        if (FactionTemplateEntry const* targetFactionTemplateEntry = target->getFactionTemplateEntry())
-            if (ReputationRank const* repRank = selfPlayerOwner->GetReputationMgr().GetForcedRankIfAny(targetFactionTemplateEntry))
-                return *repRank;
+	if (selfPlayerOwner)
+	{
+		if (selfPlayerOwner->isGameMaster())
+			return REP_NEUTRAL;
+		if (FactionTemplateEntry const* targetFactionTemplateEntry = target->getFactionTemplateEntry())
+			if (ReputationRank const* repRank = selfPlayerOwner->GetReputationMgr().GetForcedRankIfAny(targetFactionTemplateEntry))
+				return *repRank;
     }
     else if (targetPlayerOwner)
     {
         if (targetPlayerOwner->isGameMaster())
             return REP_NEUTRAL;
         if (FactionTemplateEntry const* selfFactionTemplateEntry = getFactionTemplateEntry())
-            if (ReputationRank const* repRank = targetPlayerOwner->GetReputationMgr().GetForcedRankIfAny(selfFactionTemplateEntry))
-                return *repRank;
+			if (ReputationRank const* repRank = targetPlayerOwner->GetReputationMgr().GetForcedRankIfAny(selfFactionTemplateEntry))
+				return *repRank;
     }
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
@@ -5486,7 +5486,11 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
                 if (selfPlayerOwner->duel && selfPlayerOwner->duel->opponent == targetPlayerOwner && selfPlayerOwner->duel->startTime != 0 && !selfPlayerOwner->duel->finished)
                     return REP_HOSTILE;
 
-                // same group - checks dependant only on our faction - skip FFA_PVP for example
+				// same guild - always friendly
+				if (selfPlayerOwner->IsInGuildWith(targetPlayerOwner))
+					return REP_FRIENDLY;
+
+				// same group - checks dependant only on our faction - skip FFA_PVP for example
                 if (selfPlayerOwner->IsInRaidWith(targetPlayerOwner))
                     return REP_FRIENDLY; // return true to allow config option AllowTwoSide.Interaction.Group to work
                 // however client seems to allow mixed group parties, because in 13850 client it works like:
@@ -11149,6 +11153,15 @@ bool Unit::IsInRaidWith(Unit const* unit) const
     if (u1->IsPlayer() && u2->IsPlayer())
         return u1->ToPlayer()->IsInSameRaidWith(u2->ToPlayer());
     return false;
+}
+
+bool Unit::IsInGuildWith(Unit const* unit) const
+{
+	PRELOAD
+
+	if (u1->IsPlayer() && u2->IsPlayer() && u1->ToPlayer()->GetGuildId() != 0 && u1->ToPlayer()->GetGuildId() == u2->ToPlayer()->GetGuildId())
+		return true;
+	return false;
 }
 
 void Unit::Debug(uint32 flags, const char* format, ...) const

@@ -584,8 +584,6 @@ void Channel::Say(ObjectGuid p, const char *what, uint32 lang, bool skipCheck)
 {
     if (!what)
         return;
-    if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
-        lang = LANG_UNIVERSAL;
 
     uint32 sec = 0;
     PlayerPointer plr = GetPlayer(p);

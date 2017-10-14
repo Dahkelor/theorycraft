@@ -108,40 +108,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
         // send in universal language if player in .gmon mode (ignore spell effects)
         if (_player && _player->isGameMaster())
             lang = LANG_UNIVERSAL;
-        else
-        {
-            // send in universal language in two side iteration allowed mode
-            if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT))
-                lang = LANG_UNIVERSAL;
-            else
-            {
-                switch (type)
-                {
-                    case CHAT_MSG_PARTY:
-                    case CHAT_MSG_RAID:
-                    case CHAT_MSG_RAID_LEADER:
-                    case CHAT_MSG_RAID_WARNING:
-                        // allow two side chat at group channel if two side group allowed
-                        if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                            lang = LANG_UNIVERSAL;
-                        break;
-                    case CHAT_MSG_GUILD:
-                    case CHAT_MSG_OFFICER:
-                        // allow two side chat at guild channel if two side guild allowed
-                        if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GUILD))
-                            lang = LANG_UNIVERSAL;
-                        break;
-                }
-            }
-
-            // but overwrite it by SPELL_AURA_MOD_LANGUAGE auras (only single case used)
-            if (_player)
-            {
-                Unit::AuraList const& ModLangAuras = _player->GetAurasByType(SPELL_AURA_MOD_LANGUAGE);
-                if (!ModLangAuras.empty())
-                    lang = ModLangAuras.front()->GetModifier()->m_miscvalue;
-            }
-        }
+		else if (_player)
+		{
+			Unit::AuraList const& ModLangAuras = _player->GetAurasByType(SPELL_AURA_MOD_LANGUAGE);
+			if (!ModLangAuras.empty())
+				lang = ModLangAuras.front()->GetModifier()->m_miscvalue;
+		}
 
         if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
         {
@@ -357,14 +329,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
             if (tSecurity == SEC_PLAYER && pSecurity == SEC_PLAYER)
             {
-                if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT) && GetPlayer()->GetTeam() != player->GetTeam())
+                if (player->GetZoneId() != masterPlr->GetZoneId() && masterPlr->getLevel() < sWorld.getConfig(CONFIG_UINT32_WHISP_DIFF_ZONE_MIN_LEVEL))
                 {
-                    SendWrongFactionNotice();
-                    return;
-                }
-                if (/*player->GetZoneId() != masterPlr->GetZoneId() && */masterPlr->getLevel() < sWorld.getConfig(CONFIG_UINT32_WHISP_DIFF_ZONE_MIN_LEVEL))
-                {
-                    ChatHandler(this).SendSysMessage("You cannot whisper yet.");
+                    ChatHandler(this).SendSysMessage("You cannot whisper players not in your zone yet.");
                     return;
                 }
             }
@@ -414,7 +381,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             ForwardPacketToMaster();
             if (GetMasterPlayer()->GetGuildId())
                 if (Guild* guild = sGuildMgr.GetGuildById(GetMasterPlayer()->GetGuildId()))
-                    guild->BroadcastToGuild(this, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
+                    guild->BroadcastToGuild(this, msg, lang == LANG_ADDON ? LANG_ADDON : lang);
 
             if (lang != LANG_ADDON)
                 sWorld.LogChat(this, "Guild", msg, NULL, GetMasterPlayer()->GetGuildId());
@@ -425,7 +392,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             ForwardPacketToMaster();
             if (GetMasterPlayer()->GetGuildId())
                 if (Guild* guild = sGuildMgr.GetGuildById(GetMasterPlayer()->GetGuildId()))
-                    guild->BroadcastToOfficers(this, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
+                    guild->BroadcastToOfficers(this, msg, lang == LANG_ADDON ? LANG_ADDON : lang);
 
             if (lang != LANG_ADDON)
                 sWorld.LogChat(this, "Officer", msg, NULL, GetMasterPlayer()->GetGuildId());

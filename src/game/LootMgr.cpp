@@ -1347,7 +1347,7 @@ void LoadLootTemplates_Disenchant()
     {
         if (ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype>(i))
         {
-            if (uint32 lootid = proto->DisenchantID)
+            if (uint32 lootid = proto->DisenchantID % 100)
             {
                 if (ids_set.find(lootid) == ids_set.end())
                     LootTemplates_Disenchant.ReportNotExistedId(lootid);

@@ -201,6 +201,7 @@ struct CreatureData
     bool  is_dead;
     uint8 movementType;
     uint32 spawnFlags;
+	uint8 groupType;
 
     uint32 instanciatedContinentInstanceId;
     // helper function
