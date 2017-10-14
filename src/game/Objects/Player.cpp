@@ -7376,7 +7376,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                 switch (loot_type)
                 {
                 case LOOT_DISENCHANTING:
-                    // Regrade is successful 33% of the time. If unsuccessful, item is destroyed. Upgraded items have an id +1M 
+                    // Regrade is successful 33% of the time. If unsuccessful, item is destroyed and yields enchanting materials
                     if ((urand(0, 100) < 67 || isGameMaster()) && item->GetProto()->DisenchantID > 100)
                         loot->AddItem(LootStoreItem(item->GetEntry() + 100000, 100, 0, 0, 1, 1));
                     else

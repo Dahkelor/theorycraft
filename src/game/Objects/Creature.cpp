@@ -2859,10 +2859,26 @@ void Creature::AllLootRemovedFromCorpse()
 
 uint32 Creature::GetLevelForTarget(Unit const* target) const
 {
-    if (!IsWorldBoss())
-        return Unit::GetLevelForTarget(target);
 
-    uint32 level = target->getLevel() + sWorld.getConfig(CONFIG_UINT32_WORLD_BOSS_LEVEL_DIFF);
+    uint32 level = 1;
+
+    switch (GetCreatureInfo()->rank)
+    {
+    case CREATURE_ELITE_WORLDBOSS:
+        return target->getLevel() + 3;
+    case CREATURE_ELITE_ELITE:
+    case CREATURE_ELITE_RARE:
+    case CREATURE_ELITE_NORMAL:
+    case CREATURE_ELITE_RAREELITE:
+        return getLevel();
+    default:
+        if (GetCreatureInfo()->rank > CREATURE_DYNAMIC_PLUS_3)
+            level = target->getLevel() - CREATURE_DYNAMIC_ELITE_EQUAL + GetCreatureInfo()->rank;
+        else
+            level = target->getLevel() - CREATURE_DYNAMIC_EQUAL + GetCreatureInfo()->rank;
+        break;
+    }
+
     if (level < 1)
         return 1;
     if (level > 255)

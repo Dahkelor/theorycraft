@@ -629,6 +629,13 @@ class MANGOS_DLL_SPEC WorldMap : public Map
         WorldPersistentState* GetPersistanceState() const;
 };
 
+enum DungeonMapGroupType
+{
+    INSTANCE_GROUPTYPE_NORMAL = 0,
+    INSTANCE_GROUPTYPE_MAX_LEVEL = 1,
+    INSTANCE_GROUPTYPE_RAID = 2
+};
+
 class MANGOS_DLL_SPEC DungeonMap : public Map
 {
     using Map::GetPersistentState;                      // hide in subclass for overwrite

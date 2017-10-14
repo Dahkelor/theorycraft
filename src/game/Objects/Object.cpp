@@ -700,6 +700,8 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                         //base->TrackingUpdateSent(index, m_uint32Values[index]);
                     *data << m_uint32Values[index];
                 }
+                else if (index == UNIT_FIELD_LEVEL && IsCreature())
+                    *data << ((Creature*)this)->GetLevelForTarget(target);
                 else
                 {
                     // send in current format (float as float, uint32 as uint32)

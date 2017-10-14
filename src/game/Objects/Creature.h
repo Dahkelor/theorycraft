@@ -544,7 +544,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
                 return false;
 
             uint32 rank = GetCreatureInfo()->rank;
-            return rank != CREATURE_ELITE_NORMAL && rank != CREATURE_ELITE_RARE;
+            return rank != CREATURE_ELITE_NORMAL && rank != CREATURE_ELITE_RARE && (rank < CREATURE_DYNAMIC_MINUS_3 || rank > CREATURE_DYNAMIC_PLUS_3);
         }
 
         bool IsWorldBoss() const
@@ -555,7 +555,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
             return GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS;
         }
 
-        uint32 GetLevelForTarget(Unit const* target) const override; // overwrite Unit::GetLevelForTarget for boss level support
+        uint32 GetLevelForTarget(Unit const* target) const override; // overwrite Unit::GetLevelForTarget for dynamic level support
 
         bool IsInEvadeMode() const;
 

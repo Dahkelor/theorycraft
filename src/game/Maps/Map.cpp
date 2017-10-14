@@ -1728,7 +1728,7 @@ bool DungeonMap::CanEnter(Player *player)
         return false;
     }
 
-	if (GetGroupType() == 0 && player->getLevel() > i_mapEntry->levelMax)
+	if (GetGroupType() == 0 && player->getLevel() > i_mapEntry->levelMax && !player->isGameMaster())
 	{
 		DETAIL_LOG("MAP: Instance '%u' of map '%s' has a maximum level limit of %u. Player '%s' (level %u) was not allowed to enter.", GetInstanceId(), GetMapName(), i_mapEntry->levelMax, player->GetName(), player->getLevel());
 		player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
