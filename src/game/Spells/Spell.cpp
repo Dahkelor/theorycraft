@@ -657,8 +657,8 @@ void Spell::prepareDataForTriggerSystem()
         switch (m_spellInfo->SpellFamilyName)
         {
             case SPELLFAMILY_MAGE:
-                // Blizzard triggers need do it
-                if (m_spellInfo->IsFitToFamilyMask<CF_MAGE_BLIZZARD>())
+                // Arcane Missiles / Blizzard triggers need do it
+                if (m_spellInfo->IsFitToFamilyMask(uint64(0x0000000000200080)))
                     m_canTrigger = true;
                 break;
             case SPELLFAMILY_WARLOCK:
@@ -5859,6 +5859,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!go->IsUseRequirementMet())
                         return SPELL_FAILED_TRY_AGAIN;
 
+                    // Prevent looting chests while totally immune
+                    if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && m_caster->ToPlayer()->isTotalImmune())
+                        return SPELL_FAILED_DAMAGE_IMMUNE;
                 }
                 else if (Item* item = m_targets.getItemTarget())
                 {
