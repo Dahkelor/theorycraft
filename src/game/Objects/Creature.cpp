@@ -1511,10 +1511,10 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     }
     if (data->spawnFlags & SPAWN_FLAG_DISABLED)
         return false;
-	
-	// Creature does not spawn in this version of the instance
-	if (map->IsDungeon() && ((DungeonMap*)map)->GetGroupType() != data->groupType)
-		return false;
+
+    // Creature does not spawn in this version of the instance
+    if (map->IsDungeon() && ((DungeonMap*)map)->GetGroupType() != data->groupType && data->groupType != INSTANCE_GROUPTYPE_ALL)
+        return false;
 
     CreatureInfo const *cinfo = ObjectMgr::GetCreatureTemplate(data->id);
     if (!cinfo)

@@ -1728,18 +1728,19 @@ bool DungeonMap::CanEnter(Player *player)
         return false;
     }
 
-	if (GetGroupType() == 0 && player->getLevel() > i_mapEntry->levelMax && !player->isGameMaster())
+	if (GetGroupType() == INSTANCE_GROUPTYPE_NORMAL && player->getLevel() > i_mapEntry->levelMax && !player->isGameMaster())
 	{
 		DETAIL_LOG("MAP: Instance '%u' of map '%s' has a maximum level limit of %u. Player '%s' (level %u) was not allowed to enter.", GetInstanceId(), GetMapName(), i_mapEntry->levelMax, player->GetName(), player->getLevel());
-		player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
+        // Fixme: need to send a custom message to player telling him why he couldn't enter
+        player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
 		return false;
 	}
 	// cannot enter if the instance is full (player cap), GMs don't count
-    uint32 maxPlayers = IsRaid() ? GetMaxPlayers() : GetGroupType() == 2 ? 20 : GetMaxPlayers();
+    uint32 maxPlayers = IsRaid() ? GetMaxPlayers() : GetGroupType() == INSTANCE_GROUPTYPE_RAID ? 20 : GetMaxPlayers();
     if (!player->isGameMaster() && GetPlayersCountExceptGMs() >= maxPlayers)
     {
         DETAIL_LOG("MAP: Instance '%u' of map '%s' cannot have more than '%u' players. Player '%s' rejected", GetInstanceId(), GetMapName(), maxPlayers, player->GetName());
-        // Fixme: need to send a custom message to player telling him why he couldn't enter
+        player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
         return false;
     }
 

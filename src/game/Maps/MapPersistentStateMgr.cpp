@@ -242,7 +242,7 @@ void DungeonPersistentState::SaveToDB()
 {
     // state instance data too
     std::string data;
-	uint8 groupType = 0;
+	uint8 groupType = INSTANCE_GROUPTYPE_NORMAL;
 
     if (Map *map = GetMap())
     {

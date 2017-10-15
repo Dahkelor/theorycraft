@@ -1520,10 +1520,10 @@ void ObjectMgr::LoadCreatures(bool reload)
 		if (!existsInPatch)
 			data.spawnFlags |= SPAWN_FLAG_DISABLED;
 
-		if (data.groupType > 2) 
+		if (data.groupType > INSTANCE_GROUPTYPE_ALL) 
 		{
-			sLog.outErrorDb("Table 'creature' has a wrong groupType for GUID %u. Valid range is 0-2.", guid);
-			data.groupType = 0;
+			sLog.outErrorDb("Table 'creature' has a wrong groupType for GUID %u. Valid range is 0-3.", guid);
+			data.groupType = INSTANCE_GROUPTYPE_NORMAL;
 		}
 
         if (data.modelid_override > 0 && !sCreatureDisplayInfoStore.LookupEntry(data.modelid_override))

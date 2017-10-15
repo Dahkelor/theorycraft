@@ -84,7 +84,8 @@ newsletter
 patch
 php
 
-sql/migrations/*.py
+sql/
+etc/
 
 # Generating by CMake
 revision.h

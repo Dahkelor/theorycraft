@@ -508,15 +508,15 @@ Map* MapManager::CreateInstance(uint32 id, Player * player)
     }
     else
     {
-		uint8 groupType = 0;
+		uint8 groupType = INSTANCE_GROUPTYPE_NORMAL;
         // if no instanceId via group members or instance saves is found
         // the instance will be created for the first time
 		NewInstanceId = GenerateInstanceId();
         newlyGeneratedInstanceId = true;
 		if (player->GetGroup() && player->GetGroup()->isRaidGroup())
-			groupType = 2;
+			groupType = INSTANCE_GROUPTYPE_RAID;
 		else if (player->getLevel() > entry->levelMax)
-			groupType = 1;
+			groupType = INSTANCE_GROUPTYPE_MAX_LEVEL;
 
         pNewMap = CreateDungeonMap(id, NewInstanceId, groupType);
     }
@@ -589,7 +589,7 @@ DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, uint8 gro
         MANGOS_ASSERT(false);
     }
 
-    DEBUG_LOG("MapInstanced::CreateInstanceMap: %smap instance %d for %d created (groupType %d)", save ? "" : "new ", InstanceId, id, groupType);
+    DEBUG_LOG("MapInstanced::CreateInstanceMap: %smap instance %d for %d created (type %d)", save ? "" : "new ", InstanceId, id, groupType);
 
     DungeonMap *map = new DungeonMap(id, i_gridCleanUpDelay, InstanceId);
 

@@ -656,9 +656,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                         if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2) && owner->IsFriendlyTo(target))
 	                        forceFriendly = true;
                     }
-                    uint32 faction = forceFriendly ? target->getFaction() : m_uint32Values[index];
-
-                    *data << uint32(faction);
+                    *data << uint32(forceFriendly ? target->getFaction() : m_uint32Values[index]);
                 }
                 // RAID ally-horde : pas de flag FFA
                 else if (index == PLAYER_FLAGS && (m_uint32Values[index] & PLAYER_FLAGS_FFA_PVP))
